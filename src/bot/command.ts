@@ -1,4 +1,5 @@
-import { Bot, BotCommand } from 'grammy';
+import { Bot } from 'grammy';
+import type { BotCommand } from 'grammy/types';
 import { BotContext } from '../utils/session';
 import { config } from '../config';
 import { getMainMenuKeyboard } from './keyboards';

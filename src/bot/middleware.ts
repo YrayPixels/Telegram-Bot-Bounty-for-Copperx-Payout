@@ -1,9 +1,9 @@
-import { Bot, NextFunction } from 'grammy';
+import { Bot, NextFunction, Middleware } from 'grammy';
 import { BotContext, isAuthenticated } from '../utils/session';
 import { config } from '../config';
 
 // Authentication middleware
-function authMiddleware(ctx: BotContext, next: NextFunction) {
+const authMiddleware: Middleware<BotContext> = async (ctx, next) => {
     // Skip auth check for commands that don't require authentication
     const message = ctx.message?.text;
     if (message && (
@@ -26,7 +26,7 @@ function authMiddleware(ctx: BotContext, next: NextFunction) {
 }
 
 // Session timeout middleware
-function sessionTimeoutMiddleware(ctx: BotContext, next: NextFunction) {
+const sessionTimeoutMiddleware: Middleware<BotContext> = async (ctx, next) => {
     if (isAuthenticated(ctx)) {
         const now = Date.now();
         const lastActive = ctx.session.lastCommandTime || 0;
@@ -49,7 +49,7 @@ function sessionTimeoutMiddleware(ctx: BotContext, next: NextFunction) {
 }
 
 // Error handling middleware
-function errorHandlingMiddleware(ctx: BotContext, next: NextFunction) {
+const errorHandlingMiddleware: Middleware<BotContext> = async (ctx, next) => {
     return next().catch((error) => {
         config.logger.error('Error in request handler:', error);
         return ctx.reply(
@@ -60,7 +60,7 @@ function errorHandlingMiddleware(ctx: BotContext, next: NextFunction) {
 }
 
 // Logging middleware
-function loggingMiddleware(ctx: BotContext, next: NextFunction) {
+const loggingMiddleware: Middleware<BotContext> = async (ctx, next) => {
     const startTime = Date.now();
     const userId = ctx.from?.id;
     const username = ctx.from?.username;

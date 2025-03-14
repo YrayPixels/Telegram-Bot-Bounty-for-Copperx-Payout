@@ -1,4 +1,4 @@
-import Pusher from 'pusher-js';
+import Pusher, { Channel } from 'pusher-js';
 import { Bot } from 'grammy';
 import { config } from '../config';
 import { BotContext } from '../utils/session';
@@ -20,7 +20,7 @@ export interface DepositEvent {
 export class PusherService {
     private pusher: Pusher | null = null;
     private bot: Bot<BotContext> | null = null;
-    private channels: Record<string, Pusher.Channel> = {};
+    private channels: Record<string, Channel> = {};
 
     constructor() {
         if (!config.pusher.appKey || !config.pusher.cluster) {

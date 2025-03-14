@@ -1,8 +1,8 @@
-import { Bot, session, GrammyError, HttpError } from 'grammy';
+import { Bot, session, GrammyError, HttpError, Context } from 'grammy';
 import { config } from '../config';
 import { registerCommands } from './command';
 import { setupMiddleware } from './middleware';
-import { BotContext, UserSession } from '../utils/session';
+import { UserSession, BotContext, SessionData } from '../utils/session';
 
 // Create a new bot instance
 export const bot = new Bot<BotContext>(config.bot.token);
@@ -10,6 +10,7 @@ export const bot = new Bot<BotContext>(config.bot.token);
 // Initialize the bot
 export async function initBot(): Promise<Bot<BotContext>> {
     // Set up session storage
+    // @ts-expect-error
     bot.use(session({
         initial: () => ({
             authToken: undefined,
