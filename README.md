@@ -102,9 +102,9 @@ You can deploy this bot on platforms like Render or Heroku:
 ### Project Structure
 ```
 ├── src/
-│   ├── index.ts                 // Entry point
-│   ├── config.ts                // Configuration and environment variables
-│   ├── bot/
+│   ├── index.ts//done                // Entry point
+│   ├── config.ts//done              // Configuration and environment variables
+│   ├── bot
 │   │   ├── index.ts             // Bot initialization
 │   │   ├── commands.ts          // Command definitions
 │   │   ├── middleware.ts        // Bot middleware (auth checks, etc.)
@@ -114,7 +114,7 @@ You can deploy this bot on platforms like Render or Heroku:
 │   │       ├── wallet.ts        // Wallet management handlers
 │   │       ├── transfer.ts      // Fund transfer handlers
 │   │       └── notifications.ts  // Notification handlers
-│   ├── api/
+│   ├── api//done
 │   │   ├── client.ts            // API client setup
 │   │   ├── auth.ts              // Authentication API methods
 │   │   ├── wallet.ts            // Wallet API methods
