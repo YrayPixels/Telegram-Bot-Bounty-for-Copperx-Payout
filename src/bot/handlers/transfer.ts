@@ -151,9 +151,19 @@ export function registerTransferHandlers(bot: Bot<BotContext>): void {
             // Format balance options
             let balanceText = '💰 *Available Balances*\n\n';
 
-            for (const balance of balances) {
-                balanceText += `• ${balance.availableBalance} ${balance.currency} (${balance.network})\n`;
-            }
+            if (Array.isArray(balances)) {
+
+                for (const balance of balances) {
+                    balanceText += `• Available: ${balance.walletId}\n`;
+
+                    for (const item of balance.balances) {
+                        balanceText += `• Available: ${item.balance} ${item.symbol}\n`;
+                    }
+
+                    balanceText += '\n';
+                }
+
+            } 
 
             await ctx.editMessageText(
                 '📧 *Send to Email*\n\n' +
@@ -202,10 +212,19 @@ export function registerTransferHandlers(bot: Bot<BotContext>): void {
 
             // Format balance options
             let balanceText = '💰 *Available Balances*\n\n';
+            if (Array.isArray(balances)) {
 
-            for (const balance of balances) {
-                balanceText += `• ${balance.availableBalance} ${balance.currency} (${balance.network})\n`;
-            }
+                for (const balance of balances) {
+                    balanceText += `• Available: ${balance.walletId}\n`;
+
+                    for (const item of balance.balances) {
+                        balanceText += `• Available: ${item.balance} ${item.symbol}\n`;
+                    }
+
+                    balanceText += '\n';
+                }
+
+            } 
 
             await ctx.editMessageText(
                 '🔑 *Send to Wallet*\n\n' +
@@ -280,9 +299,19 @@ export function registerTransferHandlers(bot: Bot<BotContext>): void {
             // Format balance options
             let balanceText = '💰 *Available Balances*\n\n';
 
-            for (const balance of balances) {
-                balanceText += `• ${balance.availableBalance} ${balance.currency} (${balance.network})\n`;
-            }
+            if (Array.isArray(balances)) {
+
+                for (const balance of balances) {
+                    balanceText += `• Available: ${balance.walletId}\n`;
+
+                    for (const item of balance.balances) {
+                        balanceText += `• Available: ${item.balance} ${item.symbol}\n`;
+                    }
+
+                    balanceText += '\n';
+                }
+
+            } 
 
             await ctx.editMessageText(
                 '🏦 *Withdraw to Bank Account*\n\n' +
@@ -332,9 +361,19 @@ export function registerTransferHandlers(bot: Bot<BotContext>): void {
             // Format balance options
             let balanceText = '💰 *Available Balances*\n\n';
 
-            for (const balance of balances) {
-                balanceText += `• ${balance.availableBalance} ${balance.currency} (${balance.network})\n`;
-            }
+            if (Array.isArray(balances)) {
+
+                for (const balance of balances) {
+                    balanceText += `• Available: ${balance.walletId}\n`;
+
+                    for (const item of balance.balances) {
+                        balanceText += `• Available: ${item.balance} ${item.symbol}\n`;
+                    }
+
+                    balanceText += '\n';
+                }
+
+            } 
 
             await ctx.editMessageText(
                 '🔑 *Withdraw to External Wallet*\n\n' +

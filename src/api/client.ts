@@ -12,6 +12,7 @@ export interface ApiResponse<T = any> {
 export class ApiClient {
     private client: AxiosInstance;
     private authToken?: string;
+    public sid?: string;
 
     constructor() {
         this.client = axios.create({
@@ -35,6 +36,10 @@ export class ApiClient {
                 return Promise.reject(error);
             }
         );
+    }
+
+    public setSid(sid: string) {
+        this.sid = sid;
     }
 
     // Set authentication token

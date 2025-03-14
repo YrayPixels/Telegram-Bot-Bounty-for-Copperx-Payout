@@ -1,6 +1,6 @@
 import { Bot } from 'grammy';
 import { BotContext, setStep, clearStep } from '../../utils/session';
-import { walletApi, Wallet, WalletBalance } from '../../api/wallet';
+import { walletApi, Wallet, WalletBalance, WalletBalances } from '../../api/wallet';
 import { authApi } from '../../api/auth';
 import {
     getMainMenuKeyboard,
@@ -12,26 +12,30 @@ import {
 import { config } from '../../config';
 
 // Helper function to format wallet balance display
-function formatWalletBalances(balances: WalletBalance[]): string {
-    if (balances.length === 0) {
-        return 'You don\'t have any wallet balances yet.';
-    }
+function formatWalletBalances(balances: WalletBalance | WalletBalances[]): string {
 
-    let result = '💰 *Your Wallet Balances*\n\n';
+    if (Array.isArray(balances)) {
+        let result = '💰 *Your Wallet Balances*\n\n';
 
-    for (const balance of balances) {
-        result += `*${balance.network}* (${balance.currency})\n`;
-        result += `• Available: ${balance.availableBalance} ${balance.currency}\n`;
+        for (const balance of balances) {
+            result += `• Available: ${balance.walletId}\n`;
 
-        if (parseFloat(balance.pendingBalance) > 0) {
-            result += `• Pending: ${balance.pendingBalance} ${balance.currency}\n`;
+            for (const item of balance.balances) {
+                result += `• Available: ${item.balance} ${item.symbol}\n`;
+            }
+
+            result += '\n';
         }
 
-        result += '\n';
+        return result;
+    } else {
+        return `�� *Your Wallet Balance*\n\n` +
+            `• Available: ${balances.balance} ${balances.symbol}\n` +
+            `• Address: ${balances.address}\n`;
     }
-
-    return result;
 }
+
+
 
 // Helper function to format deposit information
 function formatDepositInfo(wallet: Wallet): string {
@@ -43,7 +47,7 @@ function formatDepositInfo(wallet: Wallet): string {
 }
 
 // Handle balance display
-async function handleBalance(ctx: BotContext) {
+async function handleAllBalance(ctx: BotContext) {
     const message = ctx.callbackQuery
         ? await ctx.editMessageText('Fetching your balances...')
         : await ctx.reply('Fetching your balances...');
@@ -68,6 +72,51 @@ async function handleBalance(ctx: BotContext) {
         }
     } catch (error) {
         config.logger.error('Error fetching wallet balances:', error);
+
+        const errorMsg = '❌ *Error*\n\nFailed to fetch wallet balances. Please try again later.';
+
+        if (ctx.callbackQuery) {
+            await ctx.editMessageText(errorMsg, {
+                parse_mode: 'Markdown',
+                reply_markup: getBackToMenuKeyboard(),
+            });
+        } else {
+            //@ts-ignore
+            await ctx.api.deleteMessage(ctx.chat.id, message.message_id);
+            await ctx.reply(errorMsg, {
+                parse_mode: 'Markdown',
+                reply_markup: getBackToMenuKeyboard(),
+            });
+        }
+    }
+}
+
+// Handle balance display
+async function handleSingleBalance(ctx: BotContext) {
+    const message = ctx.callbackQuery
+        ? await ctx.editMessageText('Fetching your balances...')
+        : await ctx.reply('Fetching your balances...');
+
+    try {
+        const balances = await walletApi.getWalletBalances();
+
+        const text = formatWalletBalances(balances);
+
+        if (ctx.callbackQuery) {
+            await ctx.editMessageText(text, {
+                parse_mode: 'Markdown',
+                reply_markup: getWalletBalanceKeyboard(balances),
+            });
+        } else {
+            //@ts-ignore
+            await ctx.api.deleteMessage(ctx.chat.id, message.message_id);
+            await ctx.reply(text, {
+                parse_mode: 'Markdown',
+                reply_markup: getWalletBalanceKeyboard(balances),
+            });
+        }
+    } catch (error) {
+        config.logger.error('Error fetching wallet balance:', error);
 
         const errorMsg = '❌ *Error*\n\nFailed to fetch wallet balances. Please try again later.';
 
@@ -154,13 +203,25 @@ async function handleSettings(ctx: BotContext) {
 export function registerWalletHandlers(bot: Bot<BotContext>): void {
     // Balance command
     bot.command('balance', async (ctx) => {
-        await handleBalance(ctx);
+        await handleSingleBalance(ctx);
+    });
+
+
+    // Balance command
+    bot.command('allbalance', async (ctx) => {
+        await handleAllBalance(ctx);
+    });
+
+    // All Balance callback
+    bot.callbackQuery('allbalance', async (ctx) => {
+        await ctx.answerCallbackQuery();
+        await handleAllBalance(ctx);
     });
 
     // Balance callback
     bot.callbackQuery('balance', async (ctx) => {
         await ctx.answerCallbackQuery();
-        await handleBalance(ctx);
+        await handleSingleBalance(ctx);
     });
 
     // Deposit command

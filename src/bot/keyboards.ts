@@ -1,5 +1,5 @@
 import { InlineKeyboard } from 'grammy';
-import { Wallet, WalletBalance } from '../api/wallet';
+import { Wallet, WalletBalance, WalletBalances } from '../api/wallet';
 
 // Main menu keyboard
 export function getMainMenuKeyboard(): InlineKeyboard {
@@ -106,14 +106,21 @@ export function getTransactionHistoryKeyboard(
 }
 
 // Get wallet balance display keyboard
-export function getWalletBalanceKeyboard(balances: WalletBalance[]): InlineKeyboard {
+export function getWalletBalanceKeyboard(balances: WalletBalances[] | WalletBalance): InlineKeyboard {
     const keyboard = new InlineKeyboard();
 
-    if (balances.length > 0) {
+    if (Array.isArray(balances)) {
+        if (balances.length > 0) {
+            keyboard.text('📥 Deposit', 'deposit');
+            keyboard.text('📤 Withdraw', 'withdraw');
+            keyboard.row();
+        }
+    } else {
         keyboard.text('📥 Deposit', 'deposit');
         keyboard.text('📤 Withdraw', 'withdraw');
         keyboard.row();
     }
+
 
     keyboard.text('🔙 Back to Menu', 'main_menu');
 

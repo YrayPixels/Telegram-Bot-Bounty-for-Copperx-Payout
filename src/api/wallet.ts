@@ -10,15 +10,27 @@ export interface Wallet {
     // Add more fields as needed
 }
 
+
+
+
 export interface WalletBalance {
-    walletId: string;
-    balance: string;
-    availableBalance: string;
-    pendingBalance: string;
-    currency: string;
-    network: string;
-    // Add more fields as needed
+    decimals: 6,
+    balance: string,
+    symbol: string,
+    address: string
 }
+
+export interface WalletBalances {
+
+    walletId: string,
+    isDefault: boolean,
+    network: string,
+    balances: [
+        WalletBalance
+    ]
+
+}
+
 
 // Wallet API methods
 export const walletApi = {
@@ -33,9 +45,18 @@ export const walletApi = {
     },
 
     // Get wallet balances
-    async getWalletBalances(): Promise<WalletBalance[]> {
+    async getWalletBalances(): Promise<WalletBalances[]> {
         try {
-            const response = await apiClient.get<WalletBalance[]>('/wallets/balances');
+            const response = await apiClient.get<WalletBalances[]>('/wallets/balances');
+            return response.data;
+        } catch (error: any) {
+            throw new Error(error.response?.data?.message || 'Failed to fetch wallet balances');
+        }
+    },
+
+    async getWalletBalance(): Promise<WalletBalance> {
+        try {
+            const response = await apiClient.get<WalletBalance>('/wallets/balance');
             return response.data;
         } catch (error: any) {
             throw new Error(error.response?.data?.message || 'Failed to fetch wallet balances');

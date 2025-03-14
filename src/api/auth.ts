@@ -2,22 +2,35 @@ import { apiClient, ApiResponse } from './client';
 
 // Types for authentication
 export interface EmailOtpRequestResponse {
-    success: boolean;
-    message: string;
+    email: string,
+    sid: string
 }
 
 export interface EmailOtpAuthenticateResponse {
-    token: string;
-    organizationId: string;
+    scheme: string,
+    accessToken: string,
+    accessTokenId: string,
+    expireAt: string,
+    user: UserProfile
 }
 
 export interface UserProfile {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    organizationId: string;
-    // Add more fields as needed
+    id: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    profileImage: string,
+    organizationId: string,
+    role: string,
+    status: string,
+    type: string,
+    relayerAddress: string,
+    flags: [
+        string
+    ],
+    walletAddress: string,
+    walletId: string,
+    walletAccountType: string,
 }
 
 export interface KycStatus {
@@ -35,6 +48,7 @@ export const authApi = {
             const response = await apiClient.post<EmailOtpRequestResponse>('/auth/email-otp/request', {
                 email
             });
+            apiClient.setSid(response.data.sid);
             return response.data;
         } catch (error: any) {
             throw new Error(error.response?.data?.message || 'Failed to request OTP');
@@ -44,14 +58,18 @@ export const authApi = {
     // Authenticate with email OTP
     async authenticateWithEmailOtp(email: string, otp: string): Promise<EmailOtpAuthenticateResponse> {
         try {
+
             const response = await apiClient.post<EmailOtpAuthenticateResponse>('/auth/email-otp/authenticate', {
                 email,
-                otp
+                otp,
+                sid: apiClient.sid,
             });
 
+            console.log(response.data)
+
             // Set the auth token on successful authentication
-            if (response.data.token) {
-                apiClient.setAuthToken(response.data.token);
+            if (response.data.accessToken) {
+                apiClient.setAuthToken(response.data.accessToken);
             }
 
             return response.data;

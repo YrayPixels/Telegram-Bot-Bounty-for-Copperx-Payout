@@ -1,4 +1,5 @@
 import { Bot, session, GrammyError, HttpError, Context } from 'grammy';
+
 import { config } from '../config';
 import { registerCommands } from './command';
 import { setupMiddleware } from './middleware';
@@ -10,7 +11,7 @@ export const bot = new Bot<BotContext>(config.bot.token);
 // Initialize the bot
 export async function initBot(): Promise<Bot<BotContext>> {
     // Set up session storage
-    // @ts-expect-error
+    //@ts-ignore
     bot.use(session({
         initial: () => ({
             authToken: undefined,
@@ -20,6 +21,10 @@ export async function initBot(): Promise<Bot<BotContext>> {
             lastCommandTime: Date.now(),
             data: {},
         }),
+        getSessionKey: (ctx) => {
+            // Use user ID as the session key
+            return ctx.from?.id.toString();
+        }
     }));
 
     // Set up middleware
